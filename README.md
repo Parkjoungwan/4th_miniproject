@@ -17,10 +17,16 @@
 
 > **터미널 2개**가 필요합니다.
 
+### 0. 최초 1회 — 의존성 설치
+
+```bash
+cd my-app
+npm install
+```
+
 ### 1. json-server 실행 (터미널 1)
 
 ```bash
-cd C:\Users\User\4th_miniproject
 npx json-server@0.17.4 --watch db.json --port 3000
 ```
 
@@ -29,7 +35,7 @@ npx json-server@0.17.4 --watch db.json --port 3000
 ### 2. React 개발 서버 실행 (터미널 2)
 
 ```bash
-cd C:\Users\User\4th_miniproject\my-app
+cd my-app
 npm run dev
 ```
 
