@@ -27,7 +27,8 @@ npm install
 ### 1. json-server 실행 (터미널 1)
 
 ```bash
-npx json-server@0.17.4 --watch db.json --port 3000
+cd my-app
+npm run server
 ```
 
 → `http://localhost:3000/books` 접속 확인
