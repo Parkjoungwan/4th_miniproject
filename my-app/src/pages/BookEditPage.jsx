@@ -60,6 +60,19 @@ export default function BookEditPage() {
         </div>
       </div>
 
+      {/* 기존 표지 이미지 */}
+      {book.coverImageUrl ? (
+        <img
+          src={book.coverImageUrl}
+          alt={`${book.title} 표지`}
+          style={{ width: 180, borderRadius: 10, marginBottom: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+        />
+      ) : (
+        <div style={{ marginBottom: 24, color: 'var(--gray-400)' }}>
+          📖 표지 없음
+        </div>
+      )}
+
       <BookForm
         initialData={book}
         onSubmit={handleSubmit}
