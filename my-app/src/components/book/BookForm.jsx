@@ -10,6 +10,11 @@ export default function BookForm({ initialData = {}, onSubmit, submitLabel = 'ì 
     content: initialData.content || '',
   })
 
+  const isChanged =
+    form.title !== (initialData.title || '') ||
+    form.author !== (initialData.author || '') ||
+    form.content !== (initialData.content || '') 
+
   const [errors, setErrors] = useState({})
   const [submitError, setSubmitError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -108,7 +113,7 @@ export default function BookForm({ initialData = {}, onSubmit, submitLabel = 'ì 
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isChanged}
           >
             {isSubmitting ? 'ì €ìž¥ ì¤‘...' : submitLabel}
           </button>
@@ -116,7 +121,7 @@ export default function BookForm({ initialData = {}, onSubmit, submitLabel = 'ì 
             type="button"
             className="btn btn-ghost"
             onClick={() => navigate(-1)}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isChanged}
           >
             ì·¨ì†Œ
           </button>
