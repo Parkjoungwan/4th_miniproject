@@ -33,16 +33,23 @@ export default function BookEditPage() {
 
   // 수정 제출 — 변경된 필드만 PATCH
   const handleSubmit = async (formData) => {
-    const res = await fetch(`${BOOKS_URL}/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...formData,
-        updatedAt: new Date().toISOString(),
-      }),
-    })
-    if (!res.ok) throw new Error('도서 수정에 실패했습니다.')
-    navigate(`/books/${id}`)
+    try {
+      const res = await fetch(`${BOOKS_URL}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          updatedAt: new Date().toISOString(),
+        }),
+      })
+
+      if (!res.ok) throw new Error('도서 수정에 실패했습니다.')
+
+      window.alert('도서 정보가 수정되었습니다.')
+      navigate(`/books/${id}`)
+    } catch (err) {
+      setError(err.message)
+    }
   }
   /*
   사용자가 수정 완료 버튼을 누르면 BookForm에서 입력값을 넘겨받고, PATCH /books/:id 요청을 보냅니다.
