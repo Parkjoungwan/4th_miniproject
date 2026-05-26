@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BOOKS_URL, OPENAI_IMAGE_URL } from '../../constants/api'
 
-export default function CoverGenerator({ book, onCoverSaved }) {
+export default function CoverGenerator({ book, onCoverSaved, isGenerating, setIsGenerating }) {
   const [apiKey, setApiKey] = useState(
     import.meta.env.VITE_OPENAI_API_KEY || ''
   )
@@ -9,7 +9,6 @@ export default function CoverGenerator({ book, onCoverSaved }) {
   const [size, setSize] = useState('1024x1536')
   const [outputFormat, setOutputFormat] = useState('png')
 
-  const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [previewUrl, setPreviewUrl] = useState(null)
   const [error, setError] = useState('')
@@ -44,7 +43,7 @@ export default function CoverGenerator({ book, onCoverSaved }) {
     try {
       const prompt = buildPrompt()
 
-      const res = await fetch(OPENAI_IMAGE_URL, {
+      const res = await fetch(OPENAI_IMAGE_URL, {     // 교안 28p
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +69,7 @@ export default function CoverGenerator({ book, onCoverSaved }) {
       }
 
       const data = await res.json()
-      const b64Json = data?.data?.[0]?.b64_json
+      const b64Json = data?.data?.[0]?.b64_json     // 교안 30p
       if (!b64Json) throw new Error('이미지 데이터를 받지 못했습니다. 응답을 확인해주세요.')
 
       const imageSrc = `data:image/${outputFormat};base64,${b64Json}`

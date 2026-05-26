@@ -21,6 +21,7 @@ export default function BookDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [toast, setToast] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -41,6 +42,7 @@ export default function BookDetailPage() {
 
   // 도서 삭제
   const handleDelete = async () => {
+    if (!shouldProceedWhileGenerating()) return
     if (!window.confirm(`"${book.title}" 도서를 삭제하시겠습니까?`)) return
     try {
       const res = await fetch(`${BOOKS_URL}/${id}`, { method: 'DELETE' })
@@ -54,7 +56,14 @@ export default function BookDetailPage() {
   // AI 표지 저장 후 상태 즉시 반영
   const handleCoverSaved = (newCoverUrl) => {
     setBook(prev => ({ ...prev, coverImageUrl: newCoverUrl }))
-    showToast('✅ 표지가 저장되었습니다!')
+    showToast('✔️ 표지가 저장되었습니다!')
+  }
+
+  const shouldProceedWhileGenerating = () => {
+    if (!isGenerating) return true
+    return window.confirm(
+      'AI 이미지 생성 중입니다. 진행하면 생성 작업이 취소될 수 있습니다. 계속하시겠습니까?'
+    )
   }
 
   // 토스트 메시지
@@ -70,7 +79,15 @@ export default function BookDetailPage() {
   return (
     <main className="page">
       {/* 뒤로 가기 */}
-      <Link to="/" className="back-link">← 도서 목록으로</Link>
+      <Link
+        to="/"
+        className="back-link"
+        onClick={(e) => {
+          if (!shouldProceedWhileGenerating()) e.preventDefault()
+        }}
+      >
+        ← 도서 목록으로
+      </Link>
 
       <div className="book-detail">
         {/* 왼쪽: 표지 + AI 생성기 */}
@@ -89,7 +106,12 @@ export default function BookDetailPage() {
           )}
 
           {/* AI 표지 생성기 */}
-          <CoverGenerator book={book} onCoverSaved={handleCoverSaved} />
+          <CoverGenerator
+            book={book}
+            onCoverSaved={handleCoverSaved}
+            isGenerating={isGenerating}
+            setIsGenerating={setIsGenerating}
+          />
         </div>
 
         {/* 오른쪽: 도서 정보 */}
@@ -118,6 +140,9 @@ export default function BookDetailPage() {
             <Link
               to={`/books/${id}/edit`}
               className="btn btn-outline"
+              onClick={(e) => {
+                if (!shouldProceedWhileGenerating()) e.preventDefault()
+              }}
             >
               ✏️ 수정
             </Link>
