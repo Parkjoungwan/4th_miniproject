@@ -20,6 +20,7 @@ export default function BookDetailPage() {
   const [book, setBook] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
   const [saveModal, setSaveModal] = useState(false)  // 추가
 
   // AI 표지 생성기 토글 상태
@@ -59,7 +60,8 @@ export default function BookDetailPage() {
 
   // 도서 삭제
   const handleDelete = async () => {
-    if (!window.confirm(`"${book.title}" 도서를 삭제하시겠습니까?`)) return //삭제하기 전 확인창
+    if (!whileGenerating()) return
+    if (!window.confirm(`"${book.title}" 도서를 삭제하시겠습니까?`)) return
     try {
       const res = await fetch(`${BOOKS_URL}/${id}`, { method: 'DELETE' }) 
       // http://localhost:3000/books/1 DELETE 요청 보내고 응답 오면 res에 저장
@@ -73,9 +75,17 @@ export default function BookDetailPage() {
 
   // AI 표지 저장 후 상태 즉시 반영 (토스트메시지에서 모달로 수정)
   const handleCoverSaved = (newCoverUrl) => {
-  setBook(prev => ({ ...prev, coverImageUrl: newCoverUrl }))
-  setSaveModal(true)
+   setBook(prev => ({ ...prev, coverImageUrl: newCoverUrl }))
+    setSaveModal(true)
   }
+
+  const whileGenerating = () => {
+    if (!isGenerating) return true
+    return window.confirm(
+      'AI 이미지 생성 중입니다. 진행하면 생성 작업이 취소될 수 있습니다. 계속하시겠습니까?'
+    )
+  }
+ 
 
   if (isLoading) return <main className="page"><LoadingSpinner message="도서 정보를 불러오는 중..." /></main>
   if (error) return <main className="page"><ErrorMessage message={error} /></main>
@@ -84,7 +94,15 @@ export default function BookDetailPage() {
   return (
     <main className="page">
       {/* 뒤로 가기 */}
-      <Link to="/" className="back-link">← 도서 목록으로</Link>
+      <Link
+        to="/"
+        className="back-link"
+        onClick={(e) => {
+          if (!whileGenerating()) e.preventDefault()
+        }}
+      >
+        ← 도서 목록으로
+      </Link>
 
       <div className="book-detail">
         {/* 왼쪽: 표지 + AI 생성기 */}
@@ -116,7 +134,13 @@ export default function BookDetailPage() {
               <span className={`generator-toggle-chevron${isGeneratorOpen ? ' open' : ''}`}>▾</span>
             </button>
             <div className={`generator-collapse${isGeneratorOpen ? ' open' : ''}`}>
-              <CoverGenerator book={book} onCoverSaved={handleCoverSaved} />
+              {/* AI 표지 생성기 */}
+              <CoverGenerator
+                book={book}
+                onCoverSaved={handleCoverSaved}
+                isGenerating={isGenerating}
+                setIsGenerating={setIsGenerating}
+              />
             </div>
           </div>
         </div>
@@ -147,6 +171,9 @@ export default function BookDetailPage() {
             <Link
               to={`/books/${id}/edit`}
               className="btn btn-outline"
+              onClick={(e) => {
+                if (!whileGenerating()) e.preventDefault()
+              }}
             >
               ✏️ 수정
             </Link>
